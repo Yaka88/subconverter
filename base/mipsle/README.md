@@ -18,9 +18,19 @@ This directory contains the MIPS Little Endian (mipsel) build of subconverter.
 
 ## Runtime Requirements
 
+### Current Build (Statically Linked)
 The executable is **statically linked** and includes all required libraries. It can run on any MIPS LE device without additional dependencies.
 
-**No runtime libraries are required!**
+**No runtime libraries are required for the statically linked build!**
+
+### Alternative: Dynamically Linked Build
+If you need a smaller executable size, a dynamically linked version can be built by modifying the build script. The dynamically linked version would require the following libraries on the target system:
+
+- libc (glibc 2.3+)
+- libpthread
+- libdl
+- libm
+- libatomic (for atomic operations support)
 
 ## How to Build
 
@@ -94,6 +104,45 @@ subconverter-mipsle: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (GNU
 ## Build Time
 
 Approximate build time on GitHub Actions runners: 20-30 minutes
+
+## Troubleshooting
+
+### For Statically Linked Build (Current)
+The statically linked executable should run without any additional libraries. If you encounter issues:
+
+1. Verify your device's architecture:
+   ```bash
+   uname -m  # Should show "mips" or similar
+   cat /proc/cpuinfo | grep cpu  # Check for MIPS32 Release 2 support
+   ```
+
+2. Check file permissions:
+   ```bash
+   chmod +x subconverter-mipsle
+   ```
+
+### For Dynamically Linked Build (If Built)
+If you build a dynamically linked version and get errors about missing libraries:
+
+#### Missing libatomic
+```bash
+# On OpenWrt
+opkg update
+opkg install libatomic
+
+# On Debian-based MIPS systems
+apt-get install libatomic1
+```
+
+#### Missing other libraries
+```bash
+# On OpenWrt
+opkg update
+opkg install libc libpthread
+
+# On Debian-based MIPS systems
+apt-get install libc6 libpthread-stubs0-dev
+```
 
 ## Size Optimization
 
