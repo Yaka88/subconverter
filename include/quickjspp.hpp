@@ -21,6 +21,14 @@
 #include <sstream>
 #include <filesystem>
 
+// Compatibility for older QuickJS versions without BIG_DECIMAL/BIG_FLOAT
+#ifndef JS_TAG_BIG_DECIMAL
+#define JS_TAG_BIG_DECIMAL JS_TAG_FLOAT64
+#endif
+#ifndef JS_TAG_BIG_FLOAT
+#define JS_TAG_BIG_FLOAT JS_TAG_FLOAT64
+#endif
+
 
 #if defined(__cpp_rtti)
 #define QJSPP_TYPENAME(...) (typeid(__VA_ARGS__).name())

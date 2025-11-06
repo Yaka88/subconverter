@@ -52,6 +52,7 @@ echo "=========================================="
 if [ ! -f "${INSTALL_PREFIX}/lib/libmbedtls.a" ]; then
     git clone https://github.com/Mbed-TLS/mbedtls --depth=1 --branch mbedtls-3.6.0 || true
     cd mbedtls
+    git submodule update --init || true
     cmake -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
           -DCMAKE_C_COMPILER=${CC} \
