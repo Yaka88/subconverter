@@ -1,0 +1,42 @@
+name: Build for MIPSEL
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-mipsel:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y crossbuild-essential-mipsel gcc-mipsel-linux-gnu \
+          g++-mipsel-linux-gnu binutils-mipsel-linux-gnu cmake pkg-config \
+          git autoconf automake libtool python3 python3-pip
+    
+    - name: Build for MIPSEL
+      run: |
+        chmod +x scripts/build.mipsle.release.sh
+        bash scripts/build.mipsle.release.sh
+    
+    - name: Package release
+      run: |
+        mkdir -p release-mipsel
+        cp build-mipsel/subconverter release-mipsel/
+        cp -r base/* release-mipsel/
+        cd release-mipsel
+        tar czf ../subconverter-mipsel.tar.gz *
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: subconverter-mipsel
+        path: subconverter-mipsel.tar.gz
