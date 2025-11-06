@@ -1,7 +1,7 @@
 # MIPSEL Cross-Compilation Build Summary
 
 ## Overview
-Successfully compiled subconverter for MIPSEL (MIPS32 Little Endian) architecture with all dependencies statically linked and stack protection disabled as requested.
+Successfully compiled subconverter for MIPSEL (MIPS32 Little Endian) architecture with all dependencies statically linked and stack protection enabled.
 
 ## Build Results
 
@@ -11,18 +11,18 @@ Successfully compiled subconverter for MIPSEL (MIPS32 Little Endian) architectur
 - **Type**: Statically linked ELF 32-bit executable
 - **Size**: 
   - Stripped binary: 8.1 MB
-  - Compressed package: 3.9 MB
+  - Compressed package: 4.0 MB
 - **Target**: GNU/Linux 3.2.0 or later
 
 ### Security Configuration
-✅ **Stack protection DISABLED** (`-fno-stack-protector`)
+✅ **Stack protection ENABLED** (default GCC stack protection)
 ✅ **Static linking ENABLED** (`-static`)
 ✅ **All dependencies statically compiled**
 
 ### Checksums
 ```
-MD5:    e34ae5d57657152235bf9f62148caef4
-SHA256: 93eab45133c2e05b8f084f5903a059673aa6db6c29cf0aa7c45ac632d4b0b33f
+MD5:    37ff655923542d40c09d445502c403a0
+SHA256: 4001a140816fc40850f44da2ab08e4cef22cd0715473bf28120b30e2d585ba5b
 ```
 
 ## Compilation Process
@@ -204,7 +204,7 @@ These are informational warnings and do not affect functionality when deployed o
 
 ## Security Note
 
-⚠️ **Important**: Stack protection has been intentionally disabled per requirements. This may reduce security protections against certain types of attacks. Consider the security implications for your use case.
+✅ **Stack protection is now enabled** as requested to fix buffer overflow errors. The binary includes stack canaries to detect buffer overflows at runtime.
 
 ## Contact & Support
 

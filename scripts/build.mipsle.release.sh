@@ -3,7 +3,7 @@ set -xe
 
 # MIPSEL cross-compilation build script
 # This script builds subconverter for mipsle architecture with static dependencies
-# and stack protection disabled
+# and stack protection enabled
 
 ARCH=mipsel
 CROSS_PREFIX=mipsel-linux-gnu
@@ -22,9 +22,9 @@ export RANLIB=${CROSS_PREFIX}-ranlib
 export LD=${CROSS_PREFIX}-ld
 export STRIP=${CROSS_PREFIX}-strip
 
-# Compiler flags: disable stack protection and optimize for size
-export CFLAGS="-fno-stack-protector -Os"
-export CXXFLAGS="-fno-stack-protector -Os"
+# Compiler flags: enable stack protection and optimize for size
+export CFLAGS="-Os"
+export CXXFLAGS="-Os"
 export LDFLAGS="-static"
 
 # PKG_CONFIG setup for cross-compilation
