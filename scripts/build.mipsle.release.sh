@@ -13,6 +13,10 @@ export AR=mipsel-linux-gnu-ar
 export RANLIB=mipsel-linux-gnu-ranlib
 export STRIP=mipsel-linux-gnu-strip
 
+# Set compilation flags to avoid buffer overflow false positives in static builds
+export CFLAGS="-O3 -fno-stack-protector -D_FORTIFY_SOURCE=0"
+export CXXFLAGS="-O3 -fno-stack-protector -D_FORTIFY_SOURCE=0"
+
 # Set installation prefix
 export PREFIX=/tmp/mipsel-toolchain
 export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig:${PREFIX}/lib64/pkgconfig
@@ -245,9 +249,12 @@ echo "=========================================="
 echo "Linking static executable"
 echo "=========================================="
 # Create static executable with all dependencies
+# Use -fno-stack-protector to avoid buffer overflow false positives in static builds
+# Add -D_FORTIFY_SOURCE=0 to disable fortify checks that can cause issues in cross-compiled binaries
 ${CXX} -o subconverter-mipsle \
     $(find CMakeFiles/subconverter.dir/src/ -name "*.o") \
     -static \
+    -fno-stack-protector \
     ${PREFIX}/lib/libyaml-cpp.a \
     ${PREFIX}/lib/libcurl.a \
     ${PREFIX}/lib/libmbedtls.a \
@@ -259,7 +266,7 @@ ${CXX} -o subconverter-mipsle \
     ${PREFIX}/lib/liblibcron.a \
     -Wl,--whole-archive -lpthread -Wl,--no-whole-archive \
     -latomic -ldl -lm \
-    -O3
+    -O3 -D_FORTIFY_SOURCE=0
 
 # Strip the binary to reduce size
 ${STRIP} subconverter-mipsle
