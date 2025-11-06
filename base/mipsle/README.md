@@ -8,22 +8,19 @@ This directory contains the MIPS Little Endian (mipsel) build of subconverter.
 - **MIPS ISA**: MIPS32 Release 2
 - **ABI**: o32 (32-bit ABI)
 - **Target**: GNU/Linux 3.2.0+
+- **Linking**: **Statically linked** (no runtime dependencies required)
 
 ## Executable
 
 - **File**: `subconverter-mipsle`
-- **Size**: ~6.1 MB (stripped)
-- **Type**: ELF 32-bit LSB executable
+- **Size**: ~8.4 MB (stripped, statically linked)
+- **Type**: ELF 32-bit LSB executable, statically linked
 
 ## Runtime Requirements
 
-The executable is dynamically linked and requires the following libraries on the target system:
+The executable is **statically linked** and includes all required libraries. It can run on any MIPS LE device without additional dependencies.
 
-- libc (glibc 2.3+)
-- libpthread
-- libdl
-- libm
-- libatomic (for atomic operations support)
+**No runtime libraries are required!**
 
 ## How to Build
 
@@ -84,35 +81,15 @@ file base/mipsle/subconverter-mipsle
 
 Expected output:
 ```
-subconverter-mipsle: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld.so.1, for GNU/Linux 3.2.0, stripped
+subconverter-mipsle: ELF 32-bit LSB executable, MIPS, MIPS32 rel2 version 1 (GNU/Linux), statically linked, for GNU/Linux 3.2.0, stripped
 ```
 
 ## Notes
 
-- This build is intended for MIPS Little Endian routers and devices
+- This build is **statically linked** and does not require any runtime libraries
+- It can run on any MIPS Little Endian device with MIPS32 Release 2 support
 - Common use cases include OpenWrt routers with MIPS LE processors
-- The executable requires MIPS32 Release 2 or later processor support
-- For older MIPS32 Release 1 devices, the build script would need modification
-
-## Troubleshooting
-
-### Missing libatomic
-If you get errors about missing atomic operations:
-```bash
-# On OpenWrt
-opkg update
-opkg install libatomic
-
-# On Debian-based MIPS systems
-apt-get install libatomic1
-```
-
-### Incompatible with device
-Verify your device's architecture:
-```bash
-uname -m  # Should show "mips" or similar
-cat /proc/cpuinfo | grep cpu  # Check for MIPS32 Release 2 support
-```
+- The executable is larger (~8.4 MB) than the dynamically linked version due to included libraries, but provides better compatibility
 
 ## Build Time
 
@@ -120,9 +97,11 @@ Approximate build time on GitHub Actions runners: 20-30 minutes
 
 ## Size Optimization
 
-The executable is stripped to reduce size. If you need debug symbols:
-- Don't run the strip command in the build script
-- The unstripped binary will be approximately 6.8 MB
+The executable is statically linked and stripped to balance size and compatibility:
+- Statically linked: ~8.4 MB (stripped) - **Current version**
+- Dynamically linked: ~6.1 MB (stripped) - Requires runtime libraries
+
+The larger size of the static version is offset by not requiring any runtime library dependencies, making it much easier to deploy on embedded devices.
 
 ## License
 

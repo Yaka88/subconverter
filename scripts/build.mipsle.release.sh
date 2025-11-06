@@ -257,7 +257,8 @@ ${CXX} -o subconverter-mipsle \
     ${PREFIX}/lib/libpcre2-8.a \
     ${PREFIX}/lib/quickjs/libquickjs.a \
     ${PREFIX}/lib/liblibcron.a \
-    -pthread -ldl -lm \
+    -Wl,--whole-archive -lpthread -Wl,--no-whole-archive \
+    -latomic -ldl -lm \
     -O3
 
 # Strip the binary to reduce size
