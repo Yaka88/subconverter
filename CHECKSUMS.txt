@@ -1,9 +1,9 @@
-MD5:    e34ae5d57657152235bf9f62148caef4  subconverter-mipsel.tar.gz
-SHA256: 93eab45133c2e05b8f084f5903a059673aa6db6c29cf0aa7c45ac632d4b0b33f  subconverter-mipsel.tar.gz
+MD5:    54ce275d6316663dc53139b52096d1de  subconverter-mipsel.tar.gz
+SHA256: 1a6d2188de39510712d4b75025291ac242f7745754b726c32576bfef8326ee69  subconverter-mipsel.tar.gz
 
 Build Information:
 - Architecture: MIPSEL (MIPS32 Little Endian)
-- Build Date: Thu Nov  6 09:20:17 UTC 2025
+- Build Date: Thu Nov  6 10:40:00 UTC 2025
 - Binary Size: 8480264 bytes
 - Package Size: 4066353 bytes
 - Compiler: GCC 12.4.0 (mipsel-linux-gnu)

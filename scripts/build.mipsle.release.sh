@@ -39,7 +39,11 @@ echo "=========================================="
 if [ ! -f "${INSTALL_PREFIX}/lib/libz.a" ]; then
     git clone https://github.com/madler/zlib --depth=1 --branch v1.3.1 || true
     cd zlib
-    ./configure --prefix=${INSTALL_PREFIX} --static
+    # Temporarily remove strict flags for zlib configure
+    ORIG_CFLAGS="${CFLAGS}"
+    export CFLAGS="-fno-stack-protector -Os"
+    CC=${CC} ./configure --prefix=${INSTALL_PREFIX} --static
+    export CFLAGS="${ORIG_CFLAGS}"
     make clean || true
     make -j$(nproc)
     make install
