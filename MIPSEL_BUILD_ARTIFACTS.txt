@@ -1,0 +1,67 @@
+================================================================
+MIPSEL BUILD ARTIFACTS LOCATION
+================================================================
+
+The MIPSEL cross-compilation has been completed successfully!
+
+BUILD ARTIFACTS:
+================
+
+1. COMPILED BINARY (Stripped)
+   Location: release-mipsel/subconverter
+   Size: 8.1 MB
+   Type: MIPSEL ELF 32-bit statically linked executable
+
+2. COMPRESSED PACKAGE
+   Location: subconverter-mipsel.tar.gz
+   Size: 3.9 MB
+   Contains: Binary + all configuration files
+
+3. BUILD SCRIPTS
+   - scripts/build.mipsle.release.sh (Main build script)
+   - toolchain-mipsel.cmake (CMake toolchain)
+   - .github/workflows/build-mipsel.yml (CI/CD workflow - reference)
+
+4. DOCUMENTATION
+   - BUILD_SUMMARY_MIPSEL.md (Complete build documentation)
+   - release-mipsel/README-MIPSEL.md (Release notes)
+   - CHECKSUMS.txt (MD5 and SHA256 checksums)
+
+QUICK START:
+===========
+
+To deploy on your MIPS device:
+
+1. Extract the package:
+   tar xzf subconverter-mipsel.tar.gz
+
+2. Run the executable:
+   cd subconverter-mipsel
+   ./subconverter
+
+VERIFICATION:
+============
+
+Checksums for verification:
+MD5:    e34ae5d57657152235bf9f62148caef4
+SHA256: 93eab45133c2e05b8f084f5903a059673aa6db6c29cf0aa7c45ac632d4b0b33f
+
+REBUILD INSTRUCTIONS:
+====================
+
+To rebuild from source:
+bash scripts/build.mipsle.release.sh
+
+BUILD SPECIFICATIONS:
+====================
+
+✓ Architecture: MIPSEL (MIPS32 rel2, Little Endian)
+✓ Static Linking: ENABLED
+✓ Stack Protection: DISABLED
+✓ All Dependencies: Statically Compiled
+✓ Compiler: GCC 12.4.0 (mipsel-linux-gnu)
+✓ Build Date: 2025-11-06
+
+All files are committed to the repository and ready for use!
+
+================================================================
