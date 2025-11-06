@@ -22,9 +22,9 @@ export RANLIB=${CROSS_PREFIX}-ranlib
 export LD=${CROSS_PREFIX}-ld
 export STRIP=${CROSS_PREFIX}-strip
 
-# Compiler flags: enable stack protection and optimize for size
-export CFLAGS="-Os"
-export CXXFLAGS="-Os"
+# Compiler flags: disable stack protection and source fortification
+export CFLAGS="-O2 -g -fno-stack-protector -D_FORTIFY_SOURCE=0"
+export CXXFLAGS="-O2 -g -fno-stack-protector -D_FORTIFY_SOURCE=0"
 export LDFLAGS="-static"
 
 # PKG_CONFIG setup for cross-compilation
