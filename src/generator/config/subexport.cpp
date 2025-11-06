@@ -611,7 +611,7 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             break;
         case ProxyType::VLESS:
             singleproxy["type"] = "vless";
-            singleproxy["tls"] = true;
+            singleproxy["tls"] = x.TLSSecure;
             if (udp)
                 singleproxy["packet-encoding"] = "xudp";
             if (!x.UUID.empty())
@@ -627,6 +627,13 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             } else if (!x.Flow.empty()) {
                 singleproxy["flow"] = x.Flow;
             }
+            if (!x.TransferProtocol.empty()) {
+                singleproxy["network"] = x.TransferProtocol;
+                if (x.TransferProtocol == "ws") {
+                singleproxy["ws-opts"]["path"] = x.Path;
+                singleproxy["ws-opts"]["headers"]["Host"] = x.Host;
+            }
+}
             if (!x.PublicKey.empty() && !x.ShortID.empty()) {
                 singleproxy["reality-opts"]["public-key"] = x.PublicKey;
                 singleproxy["reality-opts"]["short-id"] = x.ShortID;
