@@ -3,6 +3,7 @@ set -xe
 
 # MIPS Little Endian Cross-Compilation Script for subconverter
 # This script cross-compiles subconverter and all its dependencies for MIPS LE architecture
+#
 
 # Set cross-compilation environment variables
 export ARCH=mipsel
@@ -251,7 +252,7 @@ echo "=========================================="
 # Add -D_FORTIFY_SOURCE=0 to disable fortify checks that can cause issues in cross-compiled binaries
 ${CXX} -o subconverter-mipsle \
     $(find CMakeFiles/subconverter.dir/src/ -name "*.o") \
-    -static -march=mips32r2 -mabi=32 -DNDEBUG\
+    -static -march=mips32r2 -mabi=32 -DNDEBUG \
     -fno-stack-protector \
     ${PREFIX}/lib/libyaml-cpp.a \
     ${PREFIX}/lib/libcurl.a \
