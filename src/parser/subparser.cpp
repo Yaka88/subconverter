@@ -1294,6 +1294,21 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 singleproxy["reality-opts"]["public-key"] >>= public_key;
                 singleproxy["reality-opts"]["short-id"] >>= short_id;
             }
+            type = singleproxy["network"].IsDefined() ? safe_as<std::string>(singleproxy["network"]) : "tcp";
+            switch(hash_(type))
+            {
+            case "ws"_hash:
+                if(singleproxy["ws-opts"].IsDefined())
+                {
+                    path = singleproxy["ws-opts"]["path"].IsDefined() ? safe_as<std::string>(singleproxy["ws-opts"]["path"]) : "/";
+                    singleproxy["ws-opts"]["headers"]["Host"] >>= host;
+                }
+                break;
+            case "grpc"_hash:
+                singleproxy["grpc-opts"]["grpc-service-name"] >>= path;
+                break;
+            // 其他网络类型类似
+            }
             vlessConstruct(node, group, ps, server, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tfo, scv, underlying_proxy);
             break;
             }

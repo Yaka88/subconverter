@@ -1,4 +1,11 @@
 #pragma once
+// Add compatibility defines for older QuickJS versions
+#ifndef JS_TAG_BIG_DECIMAL
+#define JS_TAG_BIG_DECIMAL 9
+#endif
+#ifndef JS_TAG_BIG_FLOAT
+#define JS_TAG_BIG_FLOAT 10
+#endif
 
 #include "quickjs/quickjs.h"
 
