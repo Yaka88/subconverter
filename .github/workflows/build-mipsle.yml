@@ -29,14 +29,14 @@ jobs:
     
     - name: Verify executable
       run: |
-        ls -lh base/mipsle/subconverter-mipsle
-        file base/mipsle/subconverter-mipsle
+        ls -lh base/subconverter-mipsle
+        file base/subconverter-mipsle
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: subconverter-mipsle
-        path: subconverter-mipsle
+        path: base/subconverter-mipsle
         retention-days: 30
     
     - name: Create Release (on tag)
