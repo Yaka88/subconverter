@@ -627,13 +627,27 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             } else if (!x.Flow.empty()) {
                 singleproxy["flow"] = x.Flow;
             }
-            if (!x.TransferProtocol.empty()) {
-                singleproxy["network"] = x.TransferProtocol;
-                if (x.TransferProtocol == "ws") {
-                singleproxy["ws-opts"]["path"] = x.Path;
-                singleproxy["ws-opts"]["headers"]["Host"] = x.Host;
+           // 新增：处理传输协议
+            switch(hash_(x.TransferProtocol))
+            {
+            case "tcp"_hash:
+                break;
+            case "ws"_hash:
+                singleproxy["network"] = "ws";
+                if (!x.Path.empty())
+                    singleproxy["ws-opts"]["path"] = x.Path;
+                if (!x.Host.empty())
+                    singleproxy["ws-opts"]["headers"]["Host"] = x.Host;
+                break;
+            case "grpc"_hash:
+                singleproxy["network"] = "grpc";
+                if (!x.Path.empty())
+                    singleproxy["grpc-opts"]["grpc-service-name"] = x.Path;
+                break;
+            // 其他传输类型可按需添加
+            default:
+                break;
             }
-}
             if (!x.PublicKey.empty() && !x.ShortID.empty()) {
                 singleproxy["reality-opts"]["public-key"] = x.PublicKey;
                 singleproxy["reality-opts"]["short-id"] = x.ShortID;
@@ -2670,6 +2684,9 @@ void proxyToSingBox(std::vector<Proxy> &nodes, rapidjson::Document &json, std::v
                     utls.AddMember("fingerprint", rapidjson::Value(fingerprints[rand() % fingerprints.size()].c_str(), allocator), allocator);
                     tls.AddMember("utls", utls, allocator);
                 }
+                auto transport = buildSingBoxTransport(x, allocator);
+                if (!transport.ObjectEmpty())
+                    proxy.AddMember("transport", transport, allocator);
 
                 proxy.AddMember("tls", tls, allocator);
 
