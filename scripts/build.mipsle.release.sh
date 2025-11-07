@@ -161,9 +161,8 @@ if [ ! -f ${PREFIX}/lib/quickjs/libquickjs.a ]; then
     # Apply patches if needed
     #cd quickjs
     # Use cross-compilation for QuickJS
-    cmake -DCMAKE_INSTALL_PREFIX=/tmp/mipsel-toolchain -DCMAKE_C_COMPILER=mipsel-linux-gnu-gcc -DCMAKE_CXX_COMPILER=mipsel-linux-gnu-g++ -DCMAKE_AR=/usr/bin/mipsel-linux-gnu-ar -DCMAKE_RANLIB=/usr/bin/mipsel-linux-gnu-ranlib -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-O3 -fno-stack-protector -D_FORTIFY_SOURCE=0" -DCMAKE_CXX_FLAGS="-O3 -fno-stack-protector -D_FORTIFY_SOURCE=0" . 
+    cmake -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} -DCMAKE_C_COMPILER=mipsel-linux-gnu-gcc -DCMAKE_CXX_COMPILER=mipsel-linux-gnu-g++ -DCMAKE_AR=/usr/bin/mipsel-linux-gnu-ar -DCMAKE_RANLIB=/usr/bin/mipsel-linux-gnu-ranlib -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=${CFLAGS} -DCMAKE_CXX_FLAGS=${CXXFLAGS} . 
     make quickjs -j$(nproc) 
-    #&& install -d /tmp/mipsel-toolchain/lib/quickjs/ && install -m644 quickjs/libquickjs.a /tmp/mipsel-toolchain/lib/quickjs/ && install -d /tmp/mipsel-toolchain/include/quickjs/ && install -m644 quickjs/quickjs.h quickjs/quickjs-libc.h /tmp/mipsel-toolchain/include/quickjs/ && install -m644 quickjspp.hpp /tmp/mipsel-toolchain/include/ && echo "QuickJS installed" 2>&1 | tail -20
     #cd ..
     
     install -d ${PREFIX}/lib/quickjs/
@@ -279,11 +278,10 @@ ls -lh subconverter-mipsle
 echo "=========================================="
 echo "Copying executable to base directory"
 echo "=========================================="
-mkdir -p ../base/mipsle
-cp subconverter-mipsle ../base/mipsle/
-chmod +x ../base/mipsle/subconverter-mipsle
+cp subconverter-mipsle ../base
+chmod +x ../base/subconverter-mipsle
 
 echo "=========================================="
 echo "Build completed successfully!"
-echo "Executable location: base/mipsle/subconverter-mipsle"
+echo "Executable location: base/subconverter-mipsle"
 echo "=========================================="
