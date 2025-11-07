@@ -3,6 +3,7 @@ set -xe
 
 # MIPS Little Endian Cross-Compilation Script for subconverter
 # This script cross-compiles subconverter and all its dependencies for MIPS LE architecture
+#
 
 # Set cross-compilation environment variables
 export ARCH=mipsel
