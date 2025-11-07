@@ -161,7 +161,9 @@ if [ ! -f ${PREFIX}/lib/quickjs/libquickjs.a ]; then
     # Apply patches if needed
     #cd quickjs
     # Use cross-compilation for QuickJS
-    cmake -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} -DCMAKE_C_COMPILER=mipsel-linux-gnu-gcc -DCMAKE_CXX_COMPILER=mipsel-linux-gnu-g++ -DCMAKE_AR=/usr/bin/mipsel-linux-gnu-ar -DCMAKE_RANLIB=/usr/bin/mipsel-linux-gnu-ranlib -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=${CFLAGS} -DCMAKE_CXX_FLAGS=${CXXFLAGS} . 
+    cmake -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} -DCMAKE_C_COMPILER=mipsel-linux-gnu-gcc \
+    -DCMAKE_CXX_COMPILER=mipsel-linux-gnu-g++ -DCMAKE_AR=/usr/bin/mipsel-linux-gnu-ar \
+    -DCMAKE_RANLIB=/usr/bin/mipsel-linux-gnu-ranlib -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=“${CFLAGS}” -DCMAKE_CXX_FLAGS=“${CXXFLAGS}” . 
     make quickjs -j$(nproc) 
     #cd ..
     
