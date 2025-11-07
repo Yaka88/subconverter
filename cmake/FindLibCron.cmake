@@ -1,7 +1,7 @@
 find_path(LIBCRON_INCLUDE_DIR libcron/Cron.h)
 find_path(DATE_INCLUDE_DIR date/date.h)
 
-find_library(LIBCRON_LIBRARY libcron)
+find_library(LIBCRON_LIBRARY liblibcron)
 
 set(LIBCRON_LIBRARIES "${LIBCRON_LIBRARY}")
 set(LIBCRON_INCLUDE_DIRS "${LIBCRON_INCLUDE_DIR} ${DATE_INCLUDE_DIR}")
