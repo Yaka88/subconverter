@@ -160,9 +160,10 @@ if [ ! -f ${PREFIX}/lib/quickjs/libquickjs.a ]; then
     # Apply patches if needed
     cd quickjs
     # Use cross-compilation for QuickJS
-    make clean
     make CC=${CC} \
          AR=${AR} \
+         LD=${LD:-mipsel-linux-gnu-ld} \
+         RANLIB=${RANLIB} \
          CONFIG_LTO=n \
          libquickjs.a -j$(nproc)
     cd ..
