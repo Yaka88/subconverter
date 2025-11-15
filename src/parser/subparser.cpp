@@ -357,7 +357,7 @@ void vlessConstruct(
     node.ShortID = short_id;
     node.TransferProtocol = type;
     node.Host = (host.empty() && !isIPv4(server) && !isIPv6(server)) ? server.data() : trim(host);
-    node.Path = path.empty() ? "/" : trim(path);
+    node.Path = path.empty() ? "/" : urlDecode(trim(path));
 }
 
 void explodeVmess(std::string vmess, Proxy &node)
