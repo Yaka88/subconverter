@@ -611,7 +611,7 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             break;
         case ProxyType::VLESS:
             singleproxy["type"] = "vless";
-            singleproxy["tls"] = x.TLSSecure;
+            singleproxy["tls"] = true;
             if (udp)
                 singleproxy["packet-encoding"] = "xudp";
             if (!x.UUID.empty())
