@@ -1,15 +1,7 @@
 name: Build MIPS LE
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - copilot/fix-cmake-and-workflow-errors
-    paths:
-      - 'scripts/build.mipsle.release.sh'
-      - 'cmake/FindLibCron.cmake'
-      - 'CMakeLists.txt'
-      - '.github/workflows/build-mipsle.yml'
+  workflow_dispatch:  # Manual trigger only
 
 jobs:
   build-mipsle:
