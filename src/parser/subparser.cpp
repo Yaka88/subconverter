@@ -1004,25 +1004,23 @@ void explodeTrojan(std::string trojan, Proxy &node)
     if(port == "0")
         return;
 
-    host = getUrlArg(addition, "sni");
+    host = urlDecode(getUrlArg(addition, "sni"));
     if(host.empty())
-        host = getUrlArg(addition, "peer");
+        host = urlDecode(getUrlArg(addition, "peer"));
     tfo = getUrlArg(addition, "tfo");
     scv = getUrlArg(addition, "allowInsecure");
     group = urlDecode(getUrlArg(addition, "group"));
 
     if(getUrlArg(addition, "ws") == "1")
     {
-        path = getUrlArg(addition, "wspath");
+        path = urlDecode(getUrlArg(addition, "wspath"));
         network = "ws";
     }
     // support the trojan link format used by v2ryaN and X-ui.
     // format: trojan://{password}@{server}:{port}?type=ws&security=tls&path={path (urlencoded)}&sni={host}#{name}
     else if(getUrlArg(addition, "type") == "ws")
     {
-        path = getUrlArg(addition, "path");
-        if(path.substr(0, 3) == "%2F")
-            path = urlDecode(path);
+        path = urlDecode(getUrlArg(addition, "path"));
         network = "ws";
     }
 
@@ -1245,36 +1243,45 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             singleproxy["alterId"] >>= aid;
             singleproxy["cipher"] >>= cipher;
             net = singleproxy["network"].IsDefined() ? safe_as<std::string>(singleproxy["network"]) : "tcp";
-            singleproxy["servername"] >>= sni;
+            if (singleproxy["servername"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["servername"]));
             switch(hash_(net))
             {
             case "http"_hash:
-                singleproxy["http-opts"]["path"][0] >>= path;
-                singleproxy["http-opts"]["headers"]["Host"][0] >>= host;
+                if (singleproxy["http-opts"]["path"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["http-opts"]["path"][0]));
+                if (singleproxy["http-opts"]["headers"]["Host"].IsDefined())
+                    host = urlDecode(safe_as<std::string>(singleproxy["http-opts"]["headers"]["Host"][0]));
                 edge.clear();
                 break;
             case "ws"_hash:
                 if(singleproxy["ws-opts"].IsDefined())
                 {
-                    path = singleproxy["ws-opts"]["path"].IsDefined() ? safe_as<std::string>(singleproxy["ws-opts"]["path"]) : "/";
-                    singleproxy["ws-opts"]["headers"]["Host"] >>= host;
+                    path = singleproxy["ws-opts"]["path"].IsDefined() ? urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["path"])) : "/";
+                    if (singleproxy["ws-opts"]["headers"]["Host"].IsDefined())
+                        host = urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["headers"]["Host"]));
                     singleproxy["ws-opts"]["headers"]["Edge"] >>= edge;
                 }
                 else
                 {
-                    path = singleproxy["ws-path"].IsDefined() ? safe_as<std::string>(singleproxy["ws-path"]) : "/";
-                    singleproxy["ws-headers"]["Host"] >>= host;
+                    path = singleproxy["ws-path"].IsDefined() ? urlDecode(safe_as<std::string>(singleproxy["ws-path"])) : "/";
+                    if (singleproxy["ws-headers"]["Host"].IsDefined())
+                        host = urlDecode(safe_as<std::string>(singleproxy["ws-headers"]["Host"]));
                     singleproxy["ws-headers"]["Edge"] >>= edge;
                 }
                 break;
             case "h2"_hash:
-                singleproxy["h2-opts"]["path"] >>= path;
-                singleproxy["h2-opts"]["host"][0] >>= host;
+                if (singleproxy["h2-opts"]["path"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["h2-opts"]["path"]));
+                if (singleproxy["h2-opts"]["host"].IsDefined())
+                    host = urlDecode(safe_as<std::string>(singleproxy["h2-opts"]["host"][0]));
                 edge.clear();
                 break;
             case "grpc"_hash:
-                singleproxy["servername"] >>= host;
-                singleproxy["grpc-opts"]["grpc-service-name"] >>= path;
+                if (singleproxy["servername"].IsDefined())
+                    host = urlDecode(safe_as<std::string>(singleproxy["servername"]));
+                if (singleproxy["grpc-opts"]["grpc-service-name"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["grpc-opts"]["grpc-service-name"]));
                 edge.clear();
                 break;
             }
@@ -1285,7 +1292,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             case "vless"_hash: {
             group = VLESS_DEFAULT_GROUP;
             singleproxy["uuid"] >>= uuid;
-            singleproxy["servername"] >>= sni;
+            if (singleproxy["servername"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["servername"]));
             if (singleproxy["alpn"].IsSequence())
                 singleproxy["alpn"][0] >>= alpn;
             else
@@ -1305,11 +1313,13 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 if(singleproxy["ws-opts"].IsDefined())
                 {
                     path = singleproxy["ws-opts"]["path"].IsDefined() ? urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["path"])) : "/";
-                    singleproxy["ws-opts"]["headers"]["Host"] >>= host;
+                    if (singleproxy["ws-opts"]["headers"]["Host"].IsDefined())
+                        host = urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["headers"]["Host"]));
                 }
                 break;
             case "grpc"_hash:
-                singleproxy["grpc-opts"]["grpc-service-name"] >>= path;
+                if (singleproxy["grpc-opts"]["grpc-service-name"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["grpc-opts"]["grpc-service-name"]));
                 break;
             // 其他网络类型类似
             }
@@ -1330,7 +1340,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                     if(singleproxy["plugin-opts"].IsDefined())
                     {
                         singleproxy["plugin-opts"]["mode"] >>= pluginopts_mode;
-                        singleproxy["plugin-opts"]["host"] >>= pluginopts_host;
+                        if (singleproxy["plugin-opts"]["host"].IsDefined())
+                            pluginopts_host = urlDecode(safe_as<std::string>(singleproxy["plugin-opts"]["host"]));
                     }
                     break;
                 case "v2ray-plugin"_hash:
@@ -1338,9 +1349,11 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                     if(singleproxy["plugin-opts"].IsDefined())
                     {
                         singleproxy["plugin-opts"]["mode"] >>= pluginopts_mode;
-                        singleproxy["plugin-opts"]["host"] >>= pluginopts_host;
+                        if (singleproxy["plugin-opts"]["host"].IsDefined())
+                            pluginopts_host = urlDecode(safe_as<std::string>(singleproxy["plugin-opts"]["host"]));
                         tls = safe_as<bool>(singleproxy["plugin-opts"]["tls"]) ? "tls;" : "";
-                        singleproxy["plugin-opts"]["path"] >>= path;
+                        if (singleproxy["plugin-opts"]["path"].IsDefined())
+                            path = urlDecode(safe_as<std::string>(singleproxy["plugin-opts"]["path"]));
                         pluginopts_mux = safe_as<bool>(singleproxy["plugin-opts"]["mux"]) ? "mux=4;" : "";
                     }
                     break;
@@ -1352,7 +1365,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             {
                 plugin = "obfs-local";
                 singleproxy["obfs"] >>= pluginopts_mode;
-                singleproxy["obfs-host"] >>= pluginopts_host;
+                if (singleproxy["obfs-host"].IsDefined())
+                    pluginopts_host = urlDecode(safe_as<std::string>(singleproxy["obfs-host"]));
             }
             else
                 plugin.clear();
@@ -1425,15 +1439,18 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
         case "trojan"_hash:
             group = TROJAN_DEFAULT_GROUP;
             singleproxy["password"] >>= password;
-            singleproxy["sni"] >>= host;
+            if (singleproxy["sni"].IsDefined())
+                host = urlDecode(safe_as<std::string>(singleproxy["sni"]));
             singleproxy["network"] >>= net;
             switch(hash_(net))
             {
             case "grpc"_hash:
-                singleproxy["grpc-opts"]["grpc-service-name"] >>= path;
+                if (singleproxy["grpc-opts"]["grpc-service-name"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["grpc-opts"]["grpc-service-name"]));
                 break;
             case "ws"_hash:
-                singleproxy["ws-opts"]["path"] >>= path;
+                if (singleproxy["ws-opts"]["path"].IsDefined())
+                    path = urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["path"]));
                 break;
             default:
                 net = "tcp";
@@ -1447,7 +1464,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             group = SNELL_DEFAULT_GROUP;
             singleproxy["psk"] >> password;
             singleproxy["obfs-opts"]["mode"] >>= obfs;
-            singleproxy["obfs-opts"]["host"] >>= host;
+            if (singleproxy["obfs-opts"]["host"].IsDefined())
+                host = urlDecode(safe_as<std::string>(singleproxy["obfs-opts"]["host"]));
             singleproxy["version"] >>= aid;
 
             snellConstruct(node, group, ps, server, port, password, obfs, host, to_int(aid, 0), udp, tfo, scv, underlying_proxy);
@@ -1478,7 +1496,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             if (auth_str.empty())
                 singleproxy["auth_str"] >>= auth_str;
             singleproxy["obfs"] >>= obfs;
-            singleproxy["sni"] >>= sni;
+            if (singleproxy["sni"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["sni"]));
             singleproxy["fingerprint"] >>= fingerprint;
             if (singleproxy["alpn"].IsSequence())
                 singleproxy["alpn"][0] >>= alpn;
@@ -1505,7 +1524,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 singleproxy["auth"] >>= password; 
             singleproxy["obfs"] >>= obfs;
             singleproxy["obfs-password"] >>= obfs_password;
-            singleproxy["sni"] >>= sni;
+            if (singleproxy["sni"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["sni"]));
             singleproxy["fingerprint"] >>= fingerprint;
             if (singleproxy["alpn"].IsSequence())
                 singleproxy["alpn"][0] >>= alpn;
@@ -1536,12 +1556,15 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             singleproxy["max-udp-relay-packet-size"] >>= max_udp_relay_packet_size;
             singleproxy["max-open-streams"] >>= max_open_streams;
             singleproxy["fast-open"] >>= fast_open;
+            if (singleproxy["sni"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["sni"]));
             tuicConstruct(node, group, ps, server, port, uuid, password, ip, heartbeat_interval, alpn, disable_sni, reduce_rtt, request_timeout, udp_relay_mode, congestion_controller, max_udp_relay_packet_size, max_open_streams, sni, fast_open, tfo, scv, underlying_proxy);
             break;
         case "anytls"_hash: {
             group = ANYTLS_DEFAULT_GROUP;
             singleproxy["password"] >>= password;
-            singleproxy["sni"] >>= sni;
+            if (singleproxy["sni"].IsDefined())
+                sni = urlDecode(safe_as<std::string>(singleproxy["sni"]));
             if (singleproxy["alpn"].IsSequence())
                 singleproxy["alpn"][0] >>= alpn;
             else
@@ -1585,8 +1608,8 @@ void explodeStdVMess(std::string vmess, Proxy &node)
         break;
     case "http"_hash:
     case "ws"_hash:
-        host = getUrlArg(addition, "host");
-        path = getUrlArg(addition, "path");
+        host = urlDecode(getUrlArg(addition, "host"));
+        path = urlDecode(getUrlArg(addition, "path"));
         break;
     case "quic"_hash:
         type = getUrlArg(addition, "security");
@@ -1625,15 +1648,15 @@ void explodeShadowrocket(std::string rocket, Proxy &node)
         if(obfs == "websocket")
         {
             net = "ws";
-            host = getUrlArg(addition, "obfsParam");
-            path = getUrlArg(addition, "path");
+            host = urlDecode(getUrlArg(addition, "obfsParam"));
+            path = urlDecode(getUrlArg(addition, "path"));
         }
     }
     else
     {
         net = getUrlArg(addition, "network");
-        host = getUrlArg(addition, "wsHost");
-        path = getUrlArg(addition, "wspath");
+        host = urlDecode(getUrlArg(addition, "wsHost"));
+        path = urlDecode(getUrlArg(addition, "wspath"));
     }
     tls = getUrlArg(addition, "tls") == "1" ? "tls" : "";
     aid = getUrlArg(addition, "aid");
@@ -1677,7 +1700,7 @@ void explodeKitsunebi(std::string kit, Proxy &node)
         return;
     net = getUrlArg(addition, "network");
     tls = getUrlArg(addition, "tls") == "true" ? "tls" : "";
-    host = getUrlArg(addition, "ws.host");
+    host = urlDecode(getUrlArg(addition, "ws.host"));
 
     if(remarks.empty())
         remarks = add + ":" + port;
@@ -1727,7 +1750,7 @@ void explodeStdHysteria2(std::string hysteria2, Proxy &node) {
     alpn = getUrlArg(addition, "alpn");
     obfs = getUrlArg(addition, "obfs");
     obfs_password = getUrlArg(addition, "obfs-password");
-    sni = getUrlArg(addition, "sni");
+    sni = urlDecode(getUrlArg(addition, "sni"));
 
     fingerprint = getUrlArg(addition, "pinSHA256");
     if (remarks.empty())
@@ -1797,7 +1820,7 @@ void explodeStdTuic(std::string tuic, Proxy &node) {
     max_udp_relay_packet_size = getUrlArg(addition, "max_udp_relay_packet_size");
     max_open_streams = getUrlArg(addition, "max_open_streams");
     alpn = getUrlArg(addition, "alpn");
-    sni = getUrlArg(addition, "sni");
+    sni = urlDecode(getUrlArg(addition, "sni"));
     fast_open = getUrlArg(addition, "fast_open");
     scv = getUrlArg(addition, "insecure");
 
@@ -1852,7 +1875,7 @@ void explodeStdAnyTLS(std::string anytls, Proxy &node) {
     }
 
     // 其他参数
-    sni = getUrlArg(addition, "peer");
+    sni = urlDecode(getUrlArg(addition, "peer"));
     alpn = getUrlArg(addition, "alpn");
     fingerprint = urlDecode(getUrlArg(addition, "hpkp"));
     tfo = tribool(getUrlArg(addition, "tfo"));
@@ -1930,9 +1953,9 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
     if (uuid.empty()) return;
 
     if (!addition.empty()) {
-        sni = getUrlArg(addition, "sni");
+        sni = urlDecode(getUrlArg(addition, "sni"));
         if (sni.empty()) {
-            sni = getUrlArg(addition, "peer");
+            sni = urlDecode(getUrlArg(addition, "peer"));
         }
         alpn = getUrlArg(addition, "alpn");
         fingerprint = getUrlArg(addition, "hpkp");
@@ -1941,7 +1964,7 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
         public_key = getUrlArg(addition, "pbk");
         short_id = getUrlArg(addition, "sid");
         type = getUrlArg(addition, "type");
-        host = getUrlArg(addition, "host");
+        host = urlDecode(getUrlArg(addition, "host"));
         path = urlDecode(getUrlArg(addition, "path"));
         std::string security = getUrlArg(addition, "security");
         tls = (security == "tls" || security == "reality" || !xtls.empty()) ? "tls" : "";
