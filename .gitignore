@@ -1,0 +1,7 @@
+subconverter.exe
+.vscode
+cmake-build-debug
+.idea
+base/cache
+build
+build-mipsle

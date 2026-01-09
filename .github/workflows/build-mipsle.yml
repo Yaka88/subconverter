@@ -1,0 +1,50 @@
+name: Build MIPS LE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-mipsle:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install MIPS cross-compilation toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y crossbuild-essential-mipsel g++-mipsel-linux-gnu gcc-mipsel-linux-gnu
+        sudo apt-get install -y cmake make autoconf automake libtool pkg-config git python3 python3-pip
+    
+    - name: Verify toolchain
+      run: |
+        mipsel-linux-gnu-gcc --version
+        mipsel-linux-gnu-g++ --version
+    
+    - name: Build for MIPS LE
+      run: |
+        chmod +x scripts/build.mipsle.release.sh
+        bash scripts/build.mipsle.release.sh
+    
+    - name: Verify executable
+      run: |
+        ls -lh base/subconverter-mipsle
+        file base/subconverter-mipsle
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: subconverter-mipsle
+        path: base/subconverter-mipsle
+        retention-days: 30
+    
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: subconverter-mipsle
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
