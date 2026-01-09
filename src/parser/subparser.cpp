@@ -340,6 +340,7 @@ void vlessConstruct(
         const std::string &type,
         const std::string &host,
         const std::string &path,
+        const std::string &tls,
         tribool tfo,
         tribool scv,
         const std::string &underlying_proxy
@@ -353,6 +354,7 @@ void vlessConstruct(
     node.Fingerprint = fingerprint;
     node.Flow = flow;
     node.XTLS = to_int(xtls);
+    node.TLSSecure = !tls.empty();
     node.PublicKey = public_key;
     node.ShortID = short_id;
     node.TransferProtocol = type;
@@ -1290,7 +1292,9 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 singleproxy["alpn"] >>= alpn;
             singleproxy["fingerprint"] >>= fingerprint;
             singleproxy["flow"] >>= flow;
+            tls = safe_as<std::string>(singleproxy["tls"]) == "true" ? "tls" : "";
             if (singleproxy["reality-opts"].IsDefined()) {
+                tls = "tls";
                 singleproxy["reality-opts"]["public-key"] >>= public_key;
                 singleproxy["reality-opts"]["short-id"] >>= short_id;
             }
@@ -1300,7 +1304,7 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             case "ws"_hash:
                 if(singleproxy["ws-opts"].IsDefined())
                 {
-                    path = singleproxy["ws-opts"]["path"].IsDefined() ? safe_as<std::string>(singleproxy["ws-opts"]["path"]) : "/";
+                    path = singleproxy["ws-opts"]["path"].IsDefined() ? urlDecode(safe_as<std::string>(singleproxy["ws-opts"]["path"])) : "/";
                     singleproxy["ws-opts"]["headers"]["Host"] >>= host;
                 }
                 break;
@@ -1309,7 +1313,7 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 break;
             // 其他网络类型类似
             }
-            vlessConstruct(node, group, ps, server, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tfo, scv, underlying_proxy);
+            vlessConstruct(node, group, ps, server, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, underlying_proxy);
             break;
             }
             case "ss"_hash:
@@ -1872,7 +1876,7 @@ void explodeAnyTLS(std::string anytls, Proxy &node) {
 }
 
 void explodeStdVLESS(std::string vless, Proxy &node) {
-    std::string add, port, uuid, sni, alpn, fingerprint, remarks, addition, flow, xtls, public_key, short_id, type, host, path;
+    std::string add, port, uuid, sni, alpn, fingerprint, remarks, addition, flow, xtls, public_key, short_id, type, host, path, tls;
     tribool tfo, scv;
     std::string decoded, userinfo, hostinfo;
     string_array user_parts;
@@ -1938,7 +1942,9 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
         short_id = getUrlArg(addition, "sid");
         type = getUrlArg(addition, "type");
         host = getUrlArg(addition, "host");
-        path = getUrlArg(addition, "path");
+        path = urlDecode(getUrlArg(addition, "path"));
+        std::string security = getUrlArg(addition, "security");
+        tls = (security == "tls" || security == "reality" || !xtls.empty()) ? "tls" : "";
         tfo = tribool(getUrlArg(addition, "tfo"));
         scv = tribool(getUrlArg(addition, "insecure"));
 
@@ -1952,7 +1958,7 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
     if (remarks.empty())
         remarks = add + ":" + port;
 
-    vlessConstruct(node, VLESS_DEFAULT_GROUP, remarks, add, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tfo, scv, "");
+    vlessConstruct(node, VLESS_DEFAULT_GROUP, remarks, add, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, "");
 }
 
 void explodeVLESS(std::string vless, Proxy &node) {

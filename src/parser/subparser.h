@@ -143,6 +143,7 @@ void vlessConstruct(
         const std::string &type,
         const std::string &host,
         const std::string &path,
+        const std::string &tls,
         tribool tfo,
         tribool scv,
         const std::string &underlying_proxy = ""
