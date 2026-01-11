@@ -623,7 +623,9 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 singleproxy["servername"] = x.SNI;
             if (!x.Alpn.empty())
                 singleproxy["alpn"] = x.Alpn;
-            if (!x.Fingerprint.empty())
+            // fingerprint 仅用于非 REALITY 节点（证书指纹）
+            // REALITY 节点使用 client-fingerprint（uTLS 指纹）
+            if (!x.Fingerprint.empty() && x.PublicKey.empty())
                 singleproxy["fingerprint"] = x.Fingerprint;
             if (x.XTLS == 2) {
                 singleproxy["flow"] = "xtls-rprx-vision";
@@ -653,9 +655,12 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             }
             if (!x.PublicKey.empty() && !x.ShortID.empty()) {
                 singleproxy["reality-opts"]["public-key"] = x.PublicKey;
-                singleproxy["reality-opts"]["short-id"] = x.ShortID;
-                singleproxy["reality-opts"]["short-id"].SetTag("str");
-                // singleproxy["client-fingerprint"] = "random";
+                singleproxy["reality-opts"]["short-id"] = "'" + x.ShortID + "'";
+                // client-fingerprint 是 REALITY 协议必需的字段
+                if (!x.Fingerprint.empty())
+                    singleproxy["client-fingerprint"] = x.Fingerprint;
+                else
+                    singleproxy["client-fingerprint"] = "chrome";
             }
             if (!scv.is_undef())
                 singleproxy["skip-cert-verify"] = scv.get();
