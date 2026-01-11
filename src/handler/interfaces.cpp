@@ -780,6 +780,7 @@ std::string subconverter(RESPONSE_CALLBACK_ARGS)
             }
             output_content = proxyToClash(nodes, base_content, lRulesetContent, lCustomProxyGroups, argTarget == "clashr", ext);
         }
+        output_content = regReplace(output_content, R"(short-id: ([^\s,\}\]"']+))", "short-id: '$1'");
 
         if(argUpload)
             uploadGist(argTarget, argUploadPath, output_content, false);
