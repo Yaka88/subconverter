@@ -1,11 +1,21 @@
 name: Build MIPS LE
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag Name'
+        required: false
+        type: string
 
 jobs:
   build-mipsle:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout repository
@@ -39,11 +49,13 @@ jobs:
         path: base/subconverter-mipsle
         retention-days: 30
     
-    - name: Create Release (on tag)
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
+    - name: Create Release (on tag or manual)
+      if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.tag_name != ''
+      uses: softprops/action-gh-release@v2
       with:
-        files: subconverter-mipsle
+        tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+        files: base/subconverter-mipsle
+        generate_release_notes: true
         draft: false
         prerelease: false
       env:
