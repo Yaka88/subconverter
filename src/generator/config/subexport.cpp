@@ -541,9 +541,12 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             if (!x.Password.empty())
                 singleproxy["password"] = x.Password;
             if (!x.OBFS.empty())
+            {
+                if (x.OBFSParam.empty())
+                    continue;
                 singleproxy["obfs"] = x.OBFS;
-            if (!x.OBFSParam.empty())
                 singleproxy["obfs-password"] = x.OBFSParam;
+            }
             if (!x.SNI.empty())
                 singleproxy["sni"] = x.SNI;
             if (!scv.is_undef())
@@ -651,7 +654,8 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             if (!x.PublicKey.empty() && !x.ShortID.empty()) {
                 singleproxy["reality-opts"]["public-key"] = x.PublicKey;
                 singleproxy["reality-opts"]["short-id"] = x.ShortID;
-                singleproxy["client-fingerprint"] = "random";
+                singleproxy["reality-opts"]["short-id"].SetTag("str");
+               // singleproxy["client-fingerprint"] = "random";
             }
             if (!scv.is_undef())
                 singleproxy["skip-cert-verify"] = scv.get();
