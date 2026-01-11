@@ -1958,7 +1958,9 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
             sni = urlDecode(getUrlArg(addition, "peer"));
         }
         alpn = getUrlArg(addition, "alpn");
-        fingerprint = getUrlArg(addition, "hpkp");
+        fingerprint = getUrlArg(addition, "fp");
+        if (fingerprint.empty())
+            fingerprint = getUrlArg(addition, "hpkp");
         flow = getUrlArg(addition, "flow");
         xtls = getUrlArg(addition, "xtls");
         public_key = getUrlArg(addition, "pbk");
