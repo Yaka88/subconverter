@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-apk add gcc g++ build-base linux-headers cmake make autoconf automake libtool python2 python3
+apk add gcc g++ build-base linux-headers cmake make autoconf automake libtool python3
 apk add mbedtls-dev mbedtls-static zlib-dev rapidjson-dev zlib-static pcre2-dev
 
 git clone https://github.com/curl/curl --depth=1 --branch curl-8_6_0
