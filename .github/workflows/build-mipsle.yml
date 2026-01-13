@@ -1,4 +1,4 @@
-name: Build MIPS LE
+name: Build and Release
 
 on:
   push:
@@ -27,34 +27,67 @@ jobs:
         sudo apt-get install -y crossbuild-essential-mipsel g++-mipsel-linux-gnu gcc-mipsel-linux-gnu
         sudo apt-get install -y cmake make autoconf automake libtool pkg-config git python3 python3-pip
     
-    - name: Verify toolchain
-      run: |
-        mipsel-linux-gnu-gcc --version
-        mipsel-linux-gnu-g++ --version
-    
     - name: Build for MIPS LE
       run: |
         chmod +x scripts/build.mipsle.release.sh
         bash scripts/build.mipsle.release.sh
     
-    - name: Verify executable
+    - name: Package MIPS LE
       run: |
-        ls -lh base/subconverter-mipsle
-        file base/subconverter-mipsle
+        tar -czvf subconverter-linux-mipsle.tar.gz -C base subconverter-mipsle
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: subconverter-mipsle
-        path: base/subconverter-mipsle
+        path: subconverter-linux-mipsle.tar.gz
         retention-days: 30
+
+  build-amd64:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
-    - name: Create Release (on tag or manual)
-      if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.tag_name != ''
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Build for AMD64
+      run: |
+        docker run --rm -v ${PWD}:/work -w /work alpine:3.16 /bin/sh -c "
+          apk add --no-cache bash git g++ build-base linux-headers cmake make autoconf automake libtool python3
+          chmod +x scripts/build.alpine.release.sh
+          bash scripts/build.alpine.release.sh
+        "
+        sudo chown -R $USER:$USER .
+        tar -czvf subconverter-linux-amd64.tar.gz subconverter
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: subconverter-amd64
+        path: subconverter-linux-amd64.tar.gz
+        retention-days: 30
+
+  release:
+    needs: [build-mipsle, build-amd64]
+    if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.tag_name != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+    
+    - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
-        files: base/subconverter-mipsle
+        files: artifacts/*.tar.gz
         generate_release_notes: true
         draft: false
         prerelease: false
