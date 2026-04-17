@@ -87,6 +87,7 @@ struct Proxy
     String UserId;
     uint16_t AlterId = 0;
     String TransferProtocol;
+    String GrpcMode;
     String FakeType;
     bool TLSSecure = false;
 

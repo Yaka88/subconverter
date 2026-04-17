@@ -365,6 +365,8 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 singleproxy["network"] = x.TransferProtocol;
                 singleproxy["servername"] = x.Host;
                 singleproxy["grpc-opts"]["grpc-service-name"] = x.Path;
+                if(!x.GrpcMode.empty() && x.GrpcMode != "gun")
+                    singleproxy["grpc-opts"]["grpc-mode"] = x.GrpcMode;
                 break;
             default:
                 continue;
@@ -445,6 +447,8 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 singleproxy["network"] = x.TransferProtocol;
                 if(!x.Path.empty())
                     singleproxy["grpc-opts"]["grpc-service-name"] = x.Path;
+                if(!x.GrpcMode.empty() && x.GrpcMode != "gun")
+                    singleproxy["grpc-opts"]["grpc-mode"] = x.GrpcMode;
                 break;
             case "ws"_hash:
                 singleproxy["network"] = x.TransferProtocol;
@@ -648,6 +652,8 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 singleproxy["network"] = "grpc";
                 if (!x.Path.empty())
                     singleproxy["grpc-opts"]["grpc-service-name"] = x.Path;
+                if(!x.GrpcMode.empty() && x.GrpcMode != "gun")
+                    singleproxy["grpc-opts"]["grpc-mode"] = x.GrpcMode;
                 break;
             // 其他传输类型可按需添加
             default:
