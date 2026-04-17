@@ -11,6 +11,9 @@ on:
         required: false
         type: string
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   build-mipsle:
     runs-on: ubuntu-latest
@@ -19,7 +22,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     
     - name: Install MIPS cross-compilation toolchain
       run: |
@@ -37,7 +40,7 @@ jobs:
         tar -czvf subconverter-linux-mipsle.tar.gz -C base subconverter-mipsle
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: subconverter-mipsle
         path: subconverter-linux-mipsle.tar.gz
@@ -50,7 +53,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     
     - name: Build for AMD64
       run: |
@@ -63,7 +66,7 @@ jobs:
         tar -czvf subconverter-linux-amd64.tar.gz subconverter
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: subconverter-amd64
         path: subconverter-linux-amd64.tar.gz
@@ -78,7 +81,7 @@ jobs:
     
     steps:
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: artifacts
         merge-multiple: true
