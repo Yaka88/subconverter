@@ -1,6 +1,9 @@
 #!/bin/bash
 set -xe
 
+# 仓库根目录（本脚本位于 <repo>/scripts 下），避免依赖写死的 CI 路径
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # MIPS Little Endian Cross-Compilation Script for subconverter
 # This script cross-compiles subconverter and all its dependencies for MIPS LE architecture
 #
@@ -212,7 +215,7 @@ fi
 echo "=========================================="
 echo "Building subconverter for MIPS LE"
 echo "=========================================="
-cd /home/runner/work/subconverter/subconverter
+cd "${REPO_ROOT}"
 
 # Create build directory for subconverter
 mkdir -p build-mipsle

@@ -24,16 +24,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
     
-    - name: Install MIPS cross-compilation toolchain
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y crossbuild-essential-mipsel g++-mipsel-linux-gnu gcc-mipsel-linux-gnu
-        sudo apt-get install -y cmake make autoconf automake libtool pkg-config git python3 python3-pip
-    
     - name: Build for MIPS LE
       run: |
-        chmod +x scripts/build.mipsle.release.sh
-        bash scripts/build.mipsle.release.sh
+        docker run --rm -v ${PWD}:/work -w /work debian:bookworm /bin/sh -c "
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git cmake make autoconf automake libtool pkg-config python3 file g++-mipsel-linux-gnu gcc-mipsel-linux-gnu
+          chmod +x scripts/build.mipsle.release.sh
+          bash scripts/build.mipsle.release.sh
+        "
+        sudo chown -R $USER:$USER .
     
     - name: Package MIPS LE
       run: |
