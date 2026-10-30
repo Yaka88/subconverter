@@ -1315,6 +1315,19 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
             break;
             case "vless"_hash: {
             group = VLESS_DEFAULT_GROUP;
+            uuid.clear();
+            sni.clear();
+            alpn.clear();
+            fingerprint.clear();
+            flow.clear();
+            xtls.clear();
+            public_key.clear();
+            short_id.clear();
+            host.clear();
+            path.clear();
+            grpc_mode.clear();
+            spider_x.clear();
+            support_x25519mlkem768 = tribool();
             singleproxy["uuid"] >>= uuid;
             if (singleproxy["servername"].IsDefined())
                 sni = urlDecode(safe_as<std::string>(singleproxy["servername"]));
@@ -1337,6 +1350,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                     support_x25519mlkem768 = safe_as<std::string>(singleproxy["reality-opts"]["support-x25519mlkem768"]);
                 if (singleproxy["reality-opts"]["spider-x"].IsDefined())
                     spider_x = safe_as<std::string>(singleproxy["reality-opts"]["spider-x"]);
+                else if (singleproxy["reality-opts"]["spiderX"].IsDefined())
+                    spider_x = safe_as<std::string>(singleproxy["reality-opts"]["spiderX"]);
             }
             type = singleproxy["network"].IsDefined() ? safe_as<std::string>(singleproxy["network"]) : "tcp";
             switch(hash_(type))
@@ -2016,6 +2031,8 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
         spider_x = urlDecode(getUrlArg(addition, "spx"));
         if(spider_x.empty())
             spider_x = urlDecode(getUrlArg(addition, "spiderx"));
+        if(spider_x.empty())
+            spider_x = urlDecode(getUrlArg(addition, "spiderX"));
         {
             std::string mlkem_val = getUrlArg(addition, "support-x25519mlkem768");
             if(!mlkem_val.empty())

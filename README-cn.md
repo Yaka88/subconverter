@@ -11,14 +11,19 @@
 
 ## 新增内容
 
+-   全面升级支持最新的 **Xray VLESS REALITY** 协议特性：
+    -   支持后量子混合密钥协商参数 `support-x25519mlkem768`（兼容 Xray-core v26.9.8+ 强校验及 Mihomo `reality-opts.support-x25519mlkem768`）。
+    -   支持 REALITY 爬虫伪装路径参数 `spider-x` / `spx` / `spiderX` 的双向解析与导出。
+    -   支持规范的客户端指纹 `client-fingerprint` 识别及空 `short-id` 容错。
+    -   完整支持导出为 **Clash (Mihomo / Clash.Meta)** 与 **sing-box** 配置。
+
+<details>
+<summary><b>更新历史</b></summary>
 2021/10/1
 
 -   新增 [配置文件](#配置文件) 中 `[advanced]` 部分的说明
 -   修改调整文档中的多处描述
 -   更换文档中失效的外部链接
-
-<details>
-<summary><b>更新历史</b></summary>
 2020/12/9
 
 -   新增 [特别用法](#特别用法) 中 [规则转换](#规则转换) 的说明
@@ -135,6 +140,7 @@
 | Surge 4                |   ✓   |    ✓   | surge&ver=4    |
 | Trojan                 |   ✓   |    ✓   | trojan         |
 | V2Ray                  |   ✓   |    ✓   | v2ray          |
+| sing-box               |   ✓   |    ✓   | singbox        |
 | 类 TG 代理的 HTTP/Socks 链接 |   ✓   |    ×   | 仅支持 `&url=` 调用 |
 | Mixed                  |   ×   |    ✓   | mixed          |
 | Auto                   |   ×   |    ✓   | auto           |
@@ -151,6 +157,8 @@
 3.  目标类型为 `mixed` 时，会输出所有支持的节点的单链接组成的普通订阅（Base64编码）
 
 4.  目标类型为 `auto` 时，会根据请求的 `User-Agent` 自动判断输出的目标类型，匹配规则可参见 [此处](https://github.com/metacubex/subconverter/blob/master/src/handler/interfaces.cpp#L121) （该链接有可能因为代码修改而不能准确指向相应的代码）
+
+5.  **VLESS REALITY 协议支持**：支持最新的 Xray VLESS REALITY 协议规范，包含后量子混合密钥交换（`support-x25519mlkem768`）、爬虫伪装路径（`spider-x` / `spx` / `spiderX`）、客户端指纹映射及空 `short-id` 兼容，可完整输出至 Clash (Mihomo) 与 sing-box。
 
 * * *
 

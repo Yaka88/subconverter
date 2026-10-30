@@ -2698,7 +2698,7 @@ void proxyToSingBox(std::vector<Proxy> &nodes, rapidjson::Document &json, std::v
                     tls.AddMember("reality", reality, allocator);
 
                     rapidjson::Value utls(rapidjson::kObjectType);
-                    utls.AddMember("enable",true,allocator);
+                    utls.AddMember("enabled", true, allocator);
                     if (!x.Fingerprint.empty())
                         utls.AddMember("fingerprint", rapidjson::Value(x.Fingerprint.c_str(), allocator), allocator);
                     else

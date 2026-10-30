@@ -37,6 +37,7 @@ Utility to convert between various proxy subscription formats.
 | Surge 3      |     ✓      |      ✓       | surge&ver=3 |
 | Surge 4      |     ✓      |      ✓       | surge&ver=4 |
 | V2Ray        |     ✓      |      ✓       | v2ray       |
+| sing-box     |     ✓      |      ✓       | singbox     |
 | Telegram-liked HTTP/Socks 5 links |     ✓      |      ×       | Only as source |
 
 Notice:
@@ -48,6 +49,12 @@ Notice:
    - tg://http?server=1.2.3.4&port=233&user=user&pass=pass&remark=Example
 
    - https://t.me/http?server=1.2.3.4&port=233&user=user&pass=pass&remark=Example
+
+3. **VLESS REALITY Support**: Full support for the latest Xray VLESS REALITY protocol specifications:
+   - Supports the post-quantum hybrid key exchange parameter `support-x25519mlkem768` (compatible with Xray-core v26.9.8+ strict handshake verification and Mihomo `reality-opts.support-x25519mlkem768`).
+   - Supports REALITY crawler camouflage path parameters (`spider-x` / `spx` / `spiderX`).
+   - Supports uTLS client fingerprint (`client-fingerprint`) mapping and empty `short-id` tolerance.
+   - Outbound targets fully supported in **Clash (Mihomo / Clash.Meta)** and **sing-box**.
 
 
 ---
