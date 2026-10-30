@@ -627,10 +627,10 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 singleproxy["servername"] = x.SNI;
             if (!x.Alpn.empty())
                 singleproxy["alpn"] = x.Alpn;
-            // fingerprint 仅用于非 REALITY 节点（证书指纹）
-            // REALITY 节点使用 client-fingerprint（uTLS 指纹）
-            if (!x.Fingerprint.empty() && x.PublicKey.empty())
-                singleproxy["fingerprint"] = x.Fingerprint;
+            // VLESS 的 fp 参数是 uTLS 客户端指纹，必须输出为 client-fingerprint。
+            // mihomo 的 fingerprint 是服务端证书 SHA-256 指纹，填 chrome 会导致 TLS 校验失败。
+            if (!x.Fingerprint.empty())
+                singleproxy["client-fingerprint"] = x.Fingerprint;
             if (x.XTLS == 2) {
                 singleproxy["flow"] = "xtls-rprx-vision";
             } else if (!x.Flow.empty()) {
@@ -668,9 +668,7 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
                 if (!x.SpiderX.empty())
                     singleproxy["reality-opts"]["spider-x"] = x.SpiderX;
                 // client-fingerprint 是 REALITY 协议必需的字段
-                if (!x.Fingerprint.empty())
-                    singleproxy["client-fingerprint"] = x.Fingerprint;
-                else
+                if (x.Fingerprint.empty())
                     singleproxy["client-fingerprint"] = "chrome";
             }
             if (!scv.is_undef())
