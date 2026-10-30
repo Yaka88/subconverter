@@ -144,6 +144,8 @@ namespace qjs
             JS_DefinePropertyValueStr(ctx, obj, "KeepAlive", JS_NewUint32(ctx, n.KeepAlive), JS_PROP_C_W_E);
             JS_DefinePropertyValueStr(ctx, obj, "TestUrl", JS_NewString(ctx, n.TestUrl), JS_PROP_C_W_E);
             JS_DefinePropertyValueStr(ctx, obj, "ClientId", JS_NewString(ctx, n.ClientId), JS_PROP_C_W_E);
+            JS_DefinePropertyValueStr(ctx, obj, "SupportX25519MLKEM768", js_traits<tribool>::wrap(ctx, n.SupportX25519MLKEM768), JS_PROP_C_W_E);
+            JS_DefinePropertyValueStr(ctx, obj, "SpiderX", JS_NewString(ctx, n.SpiderX), JS_PROP_C_W_E);
             return obj;
         }
 
@@ -199,7 +201,9 @@ namespace qjs
             node.KeepAlive = unwrap_free<uint32_t>(ctx, v, "KeepAlive");
             node.TestUrl = unwrap_free<std::string>(ctx, v, "TestUrl");
             node.ClientId = unwrap_free<std::string>(ctx, v, "ClientId");
-            
+            node.SupportX25519MLKEM768 = unwrap_free<tribool>(ctx, v, "SupportX25519MLKEM768");
+            node.SpiderX = unwrap_free<std::string>(ctx, v, "SpiderX");
+
             return node;
         }
     };

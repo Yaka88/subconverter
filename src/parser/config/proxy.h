@@ -158,6 +158,8 @@ struct Proxy
     uint32_t XTLS;
     String PacketEncoding;
     String ShortID;
+    tribool SupportX25519MLKEM768;
+    String SpiderX;
 
 };
 

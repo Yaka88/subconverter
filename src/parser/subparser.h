@@ -147,7 +147,9 @@ void vlessConstruct(
         tribool tfo,
         tribool scv,
         const std::string &underlying_proxy = "",
-        const std::string &grpc_mode = ""
+        const std::string &grpc_mode = "",
+        tribool support_x25519mlkem768 = tribool(),
+        const std::string &spider_x = ""
 );
 
 void explodeVmess(std::string vmess, Proxy &node);

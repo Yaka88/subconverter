@@ -500,7 +500,9 @@ int script_context_init(qjs::Context &context)
             .fun<&Proxy::AllowedIPs>("AllowedIPs")
             .fun<&Proxy::KeepAlive>("KeepAlive")
             .fun<&Proxy::TestUrl>("TestUrl")
-            .fun<&Proxy::ClientId>("ClientId");
+            .fun<&Proxy::ClientId>("ClientId")
+            .fun<&Proxy::SupportX25519MLKEM768>("SupportX25519MLKEM768")
+            .fun<&Proxy::SpiderX>("SpiderX");
         context.global().add<&makeDataURI>("makeDataURI")
             .add<&qjs_fetch>("fetch")
             .add<&base64Encode>("atob")

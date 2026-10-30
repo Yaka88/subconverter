@@ -346,7 +346,9 @@ void vlessConstruct(
         tribool tfo,
         tribool scv,
         const std::string &underlying_proxy,
-        const std::string &grpc_mode
+        const std::string &grpc_mode,
+        tribool support_x25519mlkem768,
+        const std::string &spider_x
 ) {
     commonConstruct(node, ProxyType::VLESS, group, remarks, server, port, tribool(), tfo, scv, tribool(), underlying_proxy);
     node.UUID = uuid;
@@ -362,6 +364,8 @@ void vlessConstruct(
     node.ShortID = short_id;
     node.TransferProtocol = type;
     node.GrpcMode = grpc_mode;
+    node.SupportX25519MLKEM768 = support_x25519mlkem768;
+    node.SpiderX = spider_x;
     node.Host = (host.empty() && !isIPv4(server) && !isIPv6(server)) ? server.data() : trim(host);
     node.Path = path.empty() ? "/" : trim(path);
 }
@@ -1225,7 +1229,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
     std::string obfs_password, cwnd; //hysteria2
     std::string uuid,/*ip , password*/ heartbeat_interval, disable_sni, reduce_rtt, request_timeout, udp_relay_mode, congestion_controller, max_udp_relay_packet_size, max_open_streams, fast_open;   //TUIC
     std::string idle_session_check_interval, idle_session_timeout, min_idle_session;
-    std::string flow, xtls, short_id, grpc_mode;
+    std::string flow, xtls, short_id, grpc_mode, spider_x;
+    tribool support_x25519mlkem768;
 
     string_array dns_server;
     tribool udp, tfo, scv;
@@ -1237,6 +1242,8 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
         Proxy node;
         singleproxy = yamlnode[section][i];
         grpc_mode.clear();
+        spider_x.clear();
+        support_x25519mlkem768 = tribool();
         singleproxy["type"] >>= proxytype;
         singleproxy["name"] >>= ps;
         singleproxy["server"] >>= server;
@@ -1315,13 +1322,21 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 singleproxy["alpn"][0] >>= alpn;
             else
                 singleproxy["alpn"] >>= alpn;
-            singleproxy["fingerprint"] >>= fingerprint;
+            // 优先读取 client-fingerprint（REALITY 节点使用），fallback 到 fingerprint
+            if (singleproxy["client-fingerprint"].IsDefined())
+                fingerprint = safe_as<std::string>(singleproxy["client-fingerprint"]);
+            else
+                singleproxy["fingerprint"] >>= fingerprint;
             singleproxy["flow"] >>= flow;
             tls = safe_as<std::string>(singleproxy["tls"]) == "true" ? "tls" : "";
             if (singleproxy["reality-opts"].IsDefined()) {
                 tls = "tls";
                 singleproxy["reality-opts"]["public-key"] >>= public_key;
                 singleproxy["reality-opts"]["short-id"] >>= short_id;
+                if (singleproxy["reality-opts"]["support-x25519mlkem768"].IsDefined())
+                    support_x25519mlkem768 = safe_as<std::string>(singleproxy["reality-opts"]["support-x25519mlkem768"]);
+                if (singleproxy["reality-opts"]["spider-x"].IsDefined())
+                    spider_x = safe_as<std::string>(singleproxy["reality-opts"]["spider-x"]);
             }
             type = singleproxy["network"].IsDefined() ? safe_as<std::string>(singleproxy["network"]) : "tcp";
             switch(hash_(type))
@@ -1344,7 +1359,7 @@ void explodeClash(Node yamlnode, std::vector<Proxy> &nodes)
                 break;
             // 其他网络类型类似
             }
-            vlessConstruct(node, group, ps, server, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, underlying_proxy, grpc_mode);
+            vlessConstruct(node, group, ps, server, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, underlying_proxy, grpc_mode, support_x25519mlkem768, spider_x);
             break;
             }
             case "ss"_hash:
@@ -1930,8 +1945,8 @@ void explodeAnyTLS(std::string anytls, Proxy &node) {
 }
 
 void explodeStdVLESS(std::string vless, Proxy &node) {
-    std::string add, port, uuid, sni, alpn, fingerprint, remarks, addition, flow, xtls, public_key, short_id, type, host, path, tls, mode;
-    tribool tfo, scv;
+    std::string add, port, uuid, sni, alpn, fingerprint, remarks, addition, flow, xtls, public_key, short_id, type, host, path, tls, mode, spider_x;
+    tribool tfo, scv, support_x25519mlkem768;
     std::string decoded, userinfo, hostinfo;
     string_array user_parts;
 
@@ -1998,6 +2013,14 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
         short_id = getUrlArg(addition, "sid");
         type = getUrlArg(addition, "type");
         mode = getUrlArg(addition, "mode");
+        spider_x = urlDecode(getUrlArg(addition, "spx"));
+        if(spider_x.empty())
+            spider_x = urlDecode(getUrlArg(addition, "spiderx"));
+        {
+            std::string mlkem_val = getUrlArg(addition, "support-x25519mlkem768");
+            if(!mlkem_val.empty())
+                support_x25519mlkem768 = tribool(mlkem_val);
+        }
         if(type.empty() && !getUrlArg(addition, "serviceName").empty())
             type = "grpc";
         host = urlDecode(getUrlArg(addition, "host"));
@@ -2027,7 +2050,7 @@ void explodeStdVLESS(std::string vless, Proxy &node) {
     if (remarks.empty())
         remarks = add + ":" + port;
 
-    vlessConstruct(node, VLESS_DEFAULT_GROUP, remarks, add, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, "", mode);
+    vlessConstruct(node, VLESS_DEFAULT_GROUP, remarks, add, port, uuid, sni, alpn, fingerprint, flow, xtls, public_key, short_id, type, host, path, tls, tfo, scv, "", mode, support_x25519mlkem768, spider_x);
 }
 
 void explodeVLESS(std::string vless, Proxy &node) {

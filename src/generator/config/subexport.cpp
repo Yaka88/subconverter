@@ -659,9 +659,14 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
             default:
                 break;
             }
-            if (!x.PublicKey.empty() && !x.ShortID.empty()) {
+            if (!x.PublicKey.empty()) {
                 singleproxy["reality-opts"]["public-key"] = x.PublicKey;
-                singleproxy["reality-opts"]["short-id"] = x.ShortID;
+                if (!x.ShortID.empty())
+                    singleproxy["reality-opts"]["short-id"] = x.ShortID;
+                if (!x.SupportX25519MLKEM768.is_undef())
+                    singleproxy["reality-opts"]["support-x25519mlkem768"] = x.SupportX25519MLKEM768.get();
+                if (!x.SpiderX.empty())
+                    singleproxy["reality-opts"]["spider-x"] = x.SpiderX;
                 // client-fingerprint 是 REALITY 协议必需的字段
                 if (!x.Fingerprint.empty())
                     singleproxy["client-fingerprint"] = x.Fingerprint;
@@ -2684,19 +2689,20 @@ void proxyToSingBox(std::vector<Proxy> &nodes, rapidjson::Document &json, std::v
                     tls.AddMember("alpn", alpn, allocator);
                 }
 
-                if (!x.PublicKey.empty() && !x.ShortID.empty()) {
+                if (!x.PublicKey.empty()) {
                     rapidjson::Value reality(rapidjson::kObjectType);
                     reality.AddMember("enabled", true, allocator);
-                    if (!x.PublicKey.empty())
-                        reality.AddMember("public_key", rapidjson::StringRef(x.PublicKey.c_str()), allocator);
+                    reality.AddMember("public_key", rapidjson::StringRef(x.PublicKey.c_str()), allocator);
                     if (!x.ShortID.empty())
                         reality.AddMember("short_id", rapidjson::StringRef(x.ShortID.c_str()), allocator);
                     tls.AddMember("reality", reality, allocator);
 
                     rapidjson::Value utls(rapidjson::kObjectType);
                     utls.AddMember("enable",true,allocator);
-                    std::array<std::string, 6> fingerprints = {"chrome", "firefox", "safari", "ios", "edge", "qq"};
-                    utls.AddMember("fingerprint", rapidjson::Value(fingerprints[rand() % fingerprints.size()].c_str(), allocator), allocator);
+                    if (!x.Fingerprint.empty())
+                        utls.AddMember("fingerprint", rapidjson::Value(x.Fingerprint.c_str(), allocator), allocator);
+                    else
+                        utls.AddMember("fingerprint", "chrome", allocator);
                     tls.AddMember("utls", utls, allocator);
                 }
                 auto transport = buildSingBoxTransport(x, allocator);
