@@ -71,8 +71,34 @@ jobs:
         path: subconverter-linux-amd64.tar.gz
         retention-days: 30
 
+  build-arm64:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Build for ARM64
+      run: |
+        docker run --rm -v ${PWD}:/work -w /work alpine:3.16 /bin/sh -c "
+          apk add --no-cache bash git g++ build-base linux-headers cmake make autoconf automake libtool python3
+          chmod +x scripts/build.alpine.release.sh
+          bash scripts/build.alpine.release.sh
+        "
+        sudo chown -R $USER:$USER .
+        tar -czvf subconverter-linux-arm64.tar.gz subconverter
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: subconverter-arm64
+        path: subconverter-linux-arm64.tar.gz
+        retention-days: 30
+
   release:
-    needs: [build-mipsle, build-amd64]
+    needs: [build-mipsle, build-amd64, build-arm64]
     if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.tag_name != ''
     runs-on: ubuntu-latest
     permissions:

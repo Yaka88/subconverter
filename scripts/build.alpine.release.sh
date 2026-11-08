@@ -40,12 +40,13 @@ cmake -DCMAKE_CXX_STANDARD=11 .
 make install -j4
 cd ..
 
-export PKG_CONFIG_PATH=/usr/lib64/pkgconfig
+# x86_64 上是 /usr/lib64，aarch64 上是 /usr/lib，都带上以兼容两种架构
+export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib64/pkgconfig
 cmake -DCMAKE_BUILD_TYPE=Release .
 make -j3
 rm subconverter
 # shellcheck disable=SC2046
-g++ -o base/subconverter $(find CMakeFiles/subconverter.dir/src/ -name "*.o")  -static -lpcre2-8 -lyaml-cpp -L/usr/lib64 -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lz -l:quickjs/libquickjs.a -llibcron -O3 -s
+g++ -o base/subconverter $(find CMakeFiles/subconverter.dir/src/ -name "*.o")  -static -lpcre2-8 -lyaml-cpp -L/usr/lib -L/usr/lib64 -lcurl -lmbedtls -lmbedcrypto -lmbedx509 -lz -l:quickjs/libquickjs.a -llibcron -O3 -s
 
 python3 -m ensurepip
 python3 -m pip install gitpython
